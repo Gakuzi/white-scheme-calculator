@@ -3,35 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мастер белой зарплаты</title>
+<title>Белая зарплата - Мастер расчёта</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="wizard-container">
   <h1>Мастер белой зарплаты</h1>
-  
+
+  <!-- Шаг 1: Регион -->
   <div id="step1" class="step">
-    <h2>Шаг 1: Выбор региона</h2>
+    <h2>Выберите регион</h2>
     <input type="text" id="regionSearch" placeholder="Поиск региона">
     <select id="regionSelect"></select>
     <p>По умолчанию выбран Архангельск</p>
     <button onclick="nextStep(2)">Далее</button>
   </div>
 
+  <!-- Шаг 2: Данные сотрудников -->
   <div id="step2" class="step" style="display:none">
-    <h2>Шаг 2: Ввод данных сотрудников</h2>
-    <label>Зарплата на руки (₽): <input type="number" id="salary" value="100000"></label><br>
+    <h2>Данные сотрудников</h2>
+    <label>Зарплата на руки, ₽: <input type="number" id="salary" value="100000"></label><br>
     <label>Количество сотрудников: <input type="number" id="numEmployees" value="1"></label><br>
-    <label>Затраты на бухгалтера (₽): <input type="number" id="accountant" value="60000"></label><br>
-    <label>Затраты на юриста (₽): <input type="number" id="lawyer" value="70000"></label><br>
+    <label>Бухгалтер (₽): <input type="number" id="accountant" value="60000"></label><br>
+    <label>Юрист (₽): <input type="number" id="lawyer" value="70000"></label><br>
+    <label>Обслуживание/ИТ (₽): <input type="number" id="otherCosts" value="0"></label><br>
     <button onclick="prevStep(1)">Назад</button>
     <button onclick="nextStep(3)">Далее</button>
   </div>
 
+  <!-- Шаг 3: Чек-лист рисков -->
   <div id="step3" class="step" style="display:none">
-    <h2>Шаг 3: Чек-лист рисков</h2>
-    <label>Доля технических контрагентов: 
+    <h2>Чек-лист рисков</h2>
+    <label>Технические контрагенты:
       <select id="riskTech"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
     </label><br>
     <label>Средняя ЗП vs регион:
@@ -40,10 +44,20 @@
     <label>Доля наличных расходов:
       <select id="riskCash"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
     </label><br>
+    <label>Отклонение налоговой нагрузки:
+      <select id="riskTax"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
+    <label>Смена юрадреса/директора:
+      <select id="riskDirector"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
+    <label>Дробление бизнеса:
+      <select id="riskSplit"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
     <button onclick="prevStep(2)">Назад</button>
     <button onclick="calculate()">Рассчитать</button>
   </div>
 
+  <!-- Шаг 4: Результаты -->
   <div id="step4" class="step" style="display:none">
     <h2>Результаты</h2>
     <canvas id="chart"></canvas>
