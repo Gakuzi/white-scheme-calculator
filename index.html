@@ -1,52 +1,489 @@
-<html>
+<!doctype html>
+<html lang="ru">
 <head>
-    <title>Calculator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Белая схема выгоднее — калькулятор</title>
+<meta name="description" content="Веб-калькулятор сравнения зарплатных схем: белая, серая, чёрная. Расчёты, графики и аргументы в пользу белой схемы." />
+
+<!-- Графики через CDN Chart.js (легально на GitHub Pages) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root{
+    --bg:#f7f9fc;
+    --panel:#ffffff;
+    --ink:#0f172a;
+    --muted:#64748b;
+    --ok:#0f766e;
+    --warn:#b91c1c;
+    --accent:#2563eb;
+    --line:#e5e7eb;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji";}
+  .wrap{max-width:1100px;margin:24px auto;padding:0 16px;}
+  header{display:flex;gap:16px;align-items:center;margin-bottom:18px;}
+  header h1{font-size:22px;margin:0;}
+  header .tag{font-size:12px;color:#fff;background:var(--accent);border-radius:999px;padding:4px 10px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  h2{font-size:18px;margin:0 0 12px}
+  h3{font-size:16px;margin:18px 0 8px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  input[type="number"],select{
+    width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:#fff;
+  }
+  .cols-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cols-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{
+    border:none;border-radius:10px;background:var(--accent);color:#fff;padding:10px 14px;font-weight:600;cursor:pointer
+  }
+  .btn.flat{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px;border-bottom:1px dashed var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  .kpi{font-variant-numeric:tabular-nums}
+  .good{color:var(--ok);font-weight:700}
+  .bad{color:var(--warn);font-weight:700}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;color:var(--muted)}
+  .note{font-size:13px;color:var(--muted)}
+  .divider{height:1px;background:var(--line);margin:14px 0}
+  footer{margin:22px 0 40px;color:var(--muted);font-size:12px}
+  details summary{cursor:pointer;font-weight:600}
+  .sticky-actions{position:sticky;bottom:12px;display:flex;gap:10px;justify-content:flex-end}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-    <h1>Calculator</h1>
-    <input type="text" id="result" disabled />
-    <div>
-        <button onclick="clearResult()">C</button>
-        <button onclick="appendToResult('7')">7</button>
-        <button onclick="appendToResult('8')">8</button>
-        <button onclick="appendToResult('9')">9</button>
-        <button onclick="appendToResult('/')">/</button>
-    </div>
-    <div>
-        <button onclick="appendToResult('4')">4</button>
-        <button onclick="appendToResult('5')">5</button>
-        <button onclick="appendToResult('6')">6</button>
-        <button onclick="appendToResult('*')">*</button>
-    </div>
-    <div>
-        <button onclick="appendToResult('1')">1</button>
-        <button onclick="appendToResult('2')">2</button>
-        <button onclick="appendToResult('3')">3</button>
-        <button onclick="appendToResult('-')">-</button>
-    </div>
-    <div>
-        <button onclick="appendToResult('0')">0</button>
-        <button onclick="calculateResult()">=</button>
-        <button onclick="appendToResult('+')">+</button>
+<div class="wrap">
+  <header>
+    <h1>Белая схема выгоднее — калькулятор</h1>
+    <span class="tag">HTML • CSS • JS</span>
+  </header>
+
+  <!-- Вводные данные -->
+  <section class="grid">
+    <div class="card" id="inputsCard">
+      <h2>Вводные данные</h2>
+      <div class="cols-2">
+        <div>
+          <label for="W">Зарплата на руки (W), ₽</label>
+          <input id="W" type="number" min="0" step="100" value="100000" />
+        </div>
+        <div>
+          <label for="mrot">МРОТ, ₽</label>
+          <input id="mrot" type="number" min="0" step="1" value="19242" />
+        </div>
+        <div>
+          <label for="rk">Районный коэффициент (РК)</label>
+          <input id="rk" type="number" step="0.01" value="1.2" />
+        </div>
+        <div>
+          <label for="north">Северная надбавка (доля, напр. 0.5)</label>
+          <input id="north" type="number" step="0.01" value="0.5" />
+        </div>
+        <div>
+          <label for="p">НДФЛ p</label>
+          <input id="p" type="number" step="0.01" value="0.13" />
+        </div>
+        <div>
+          <label for="c">Взносы c</label>
+          <input id="c" type="number" step="0.01" value="0.30" />
+        </div>
+        <div>
+          <label for="t">Ставка УСН t</label>
+          <input id="t" type="number" step="0.01" value="0.15" />
+        </div>
+        <div>
+          <label for="k">Комиссия обнала k</label>
+          <input id="k" type="number" step="0.01" value="0.13" />
+        </div>
+        <div>
+          <label for="phi">Штрафной множитель φ</label>
+          <input id="phi" type="number" step="0.01" value="1.2" />
+        </div>
+        <div>
+          <label for="Smed">Экономия на больничных (S_med), ₽</label>
+          <input id="Smed" type="number" step="1" value="1700" />
+        </div>
+      </div>
+
+      <h3>Накладные расходы</h3>
+      <div class="cols-3">
+        <div>
+          <label>Бухгалтер (белая), ₽</label>
+          <input id="accWhite" type="number" step="100" value="3000" />
+        </div>
+        <div>
+          <label>Бухгалтер (серая), ₽</label>
+          <input id="accGrey" type="number" step="100" value="4000" />
+        </div>
+        <div>
+          <label>Бухгалтер (чёрная), ₽</label>
+          <input id="accBlack" type="number" step="100" value="4500" />
+        </div>
+        <div>
+          <label>Юрист (белая), ₽</label>
+          <input id="lawWhite" type="number" step="100" value="3500" />
+        </div>
+        <div>
+          <label>Юрист (серая), ₽</label>
+          <input id="lawGrey" type="number" step="100" value="5000" />
+        </div>
+        <div>
+          <label>Юрист (чёрная), ₽</label>
+          <input id="lawBlack" type="number" step="100" value="6500" />
+        </div>
+        <div>
+          <label>Обслуживание «чёрной» бух., ₽</label>
+          <input id="svcBlack" type="number" step="100" value="0" />
+        </div>
+        <div>
+          <label>Серверы / ИТ, ₽</label>
+          <input id="it" type="number" step="100" value="0" />
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="row">
+        <button class="btn" id="calcBtn">Рассчитать</button>
+        <button class="btn flat" id="resetBtn">Сбросить</button>
+        <span class="pill">Автосохранение полей в браузере</span>
+      </div>
+      <p class="note">Подсказка: все доли вводятся в формате 0.15 (то есть 15% → 0.15).</p>
     </div>
 
-    <script>
-        function appendToResult(value) {
-            document.getElementById('result').value += value;
-        }
+    <!-- Чек-лист рисков -->
+    <div class="card">
+      <h2>Чек-лист рисков</h2>
+      <p class="note">Оцените каждый фактор: 0 — нет, 0.5 — средний, 1 — высокий.</p>
+      <div id="risks" class="cols-2"></div>
+      <div class="divider"></div>
+      <div class="cols-3">
+        <div>
+          <label>Средний риск R</label>
+          <input id="R" type="number" readonly />
+        </div>
+        <div>
+          <label>Вероятность за 3 года P₃ = R × 0.3</label>
+          <input id="P3" type="number" readonly />
+        </div>
+        <div>
+          <label>Вероятность в месяц P = P₃ / 36</label>
+          <input id="P" type="number" readonly />
+        </div>
+      </div>
+      <p class="note">Эта вероятность участвует только в рисковых слагаемых «серой» и «чёрной» схем.</p>
+    </div>
+  </section>
 
-        function clearResult() {
-            document.getElementById('result').value = '';
-        }
+  <!-- Результаты и графики -->
+  <section class="grid" style="margin-top:16px">
+    <div class="card">
+      <h2>Результаты сравнения</h2>
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th>Схема</th>
+            <th>Месяц, ₽</th>
+            <th>Год, ₽</th>
+            <th>Экономия vs. белая</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Белая</td>
+            <td class="kpi" id="whiteM">—</td>
+            <td class="kpi" id="whiteY">—</td>
+            <td class="kpi">—</td>
+          </tr>
+          <tr>
+            <td>Серая</td>
+            <td class="kpi" id="greyM">—</td>
+            <td class="kpi" id="greyY">—</td>
+            <td class="kpi" id="greySave">—</td>
+          </tr>
+          <tr>
+            <td>Чёрная</td>
+            <td class="kpi" id="blackM">—</td>
+            <td class="kpi" id="blackY">—</td>
+            <td class="kpi" id="blackSave">—</td>
+          </tr>
+        </tbody>
+      </table>
 
-        function calculateResult() {
-            var resultField = document.getElementById('result');
-            try {
-                resultField.value = eval(resultField.value);
-            } catch (e) {
-                resultField.value = 'Error';
-            }
-        }
-    </script>
+      <div class="divider"></div>
+      <details>
+        <summary>Промежуточные показатели (формулы)</summary>
+        <div class="cols-3" style="margin-top:10px">
+          <div><label>M = РК × (1 + Северная)</label><input id="M" readonly></div>
+          <div><label>G = W / (1 − p)</label><input id="G" readonly></div>
+          <div><label>G_min = МРОТ × M</label><input id="Gmin" readonly></div>
+          <div><label>W_min = G_min × (1 − p)</label><input id="Wmin" readonly></div>
+          <div><label>E = max(W − W_min, 0)</label><input id="E" readonly></div>
+        </div>
+      </details>
+
+      <div class="sticky-actions">
+        <button class="btn flat" id="printBtn">Печать / PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Графики</h2>
+      <canvas id="barChart" height="210"></canvas>
+      <div class="divider"></div>
+      <canvas id="pieChart" height="210"></canvas>
+      <p class="note">Столбики показывают месячную стоимость по схемам; круг — доли каждой схемы в общей сумме.</p>
+    </div>
+  </section>
+
+  <!-- Аргументы -->
+  <section class="card" style="margin-top:16px">
+    <h2>Почему «белая схема» выгоднее</h2>
+    <div class="grid">
+      <div>
+        <h3>Финансовые</h3>
+        <ul>
+          <li>Снижение совокупного риска доначислений: рисковое слагаемое не применяется к «белой» схеме.</li>
+          <li>Прозрачность для банков → доступ к кредитам, лизингу, инвестициям на лучших ставках.</li>
+          <li>Отсутствие каскада штрафов/пени, способных «съесть» краткосрочную «экономию» серых схем.</li>
+        </ul>
+
+        <h3>Морально-этические и HR</h3>
+        <ul>
+          <li>Доверие и удержание сотрудников: белая зарплата, стаж, больничные, кредиты.</li>
+          <li>Упрощённый найм сильных специалистов, для которых «белая» — базовый стандарт.</li>
+          <li>Снижение текучести → меньше затрат на поиск/онбординг и провалы в проектах.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Имидж и продажи</h3>
+        <ul>
+          <li>Рост доверия у клиентов и партнёров, открывает двери к крупным тендерам и госзакупкам.</li>
+          <li>Снижение персональных рисков руководства и собственников.</li>
+          <li>Устойчивость и масштабируемость: прозрачные процессы легче автоматизировать и масштабировать.</li>
+        </ul>
+
+        <h3>Итог тезисно</h3>
+        <ul>
+          <li>«Серая/чёрная» схемы дают иллюзию экономии, но риск-скорректированная стоимость выше.</li>
+          <li>«Белая» схема — фундамент долгосрочной маржинальности, стоимости компании и бренда.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © Сделано для Евгения Климова. Приложение работает офлайн, данные не покидают ваш браузер.
+  </footer>
+</div>
+
+<script>
+/* ---------- Утилиты ---------- */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const toNum = (v, def=0) => {
+  const n = typeof v === 'number' ? v : parseFloat(String(v).replace(',', '.'));
+  return Number.isFinite(n) ? n : def;
+};
+const fmt = n => (isFinite(n)? n.toLocaleString('ru-RU', {maximumFractionDigits:0}) : '—');
+const fmt2 = n => (isFinite(n)? n.toLocaleString('ru-RU', {maximumFractionDigits:2}) : '—');
+
+/* ---------- Риски UI ---------- */
+const riskFactors = [
+  "Доля «технических» контрагентов",
+  "Средняя ЗП vs. регион",
+  "Доля наличных расходов",
+  "Отклонение налоговой нагрузки",
+  "Смена юрадреса/директора",
+  "Дробление бизнеса"
+];
+
+function buildRisks(){
+  const box = $("#risks"); box.innerHTML = "";
+  riskFactors.forEach((name, i)=>{
+    const wrap = document.createElement('div');
+    const id = "risk_"+i;
+    wrap.innerHTML = `
+      <label for="${id}">${name}</label>
+      <select id="${id}">
+        <option value="0">0 — нет</option>
+        <option value="0.5">0.5 — средний</option>
+        <option value="1">1 — высокий</option>
+      </select>
+    `;
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- Чтение входных данных ---------- */
+function getInputs(){
+  return {
+    W: toNum($("#W").value),
+    mrot: toNum($("#mrot").value),
+    rk: toNum($("#rk").value),
+    north: toNum($("#north").value),
+    p: toNum($("#p").value),
+    c: toNum($("#c").value),
+    t: toNum($("#t").value),
+    k: toNum($("#k").value),
+    phi: toNum($("#phi").value),
+    Smed: toNum($("#Smed").value),
+    accWhite: toNum($("#accWhite").value),
+    accGrey: toNum($("#accGrey").value),
+    accBlack: toNum($("#accBlack").value),
+    lawWhite: toNum($("#lawWhite").value),
+    lawGrey: toNum($("#lawGrey").value),
+    lawBlack: toNum($("#lawBlack").value),
+    svcBlack: toNum($("#svcBlack").value),
+    it: toNum($("#it").value),
+    risks: riskFactors.map((_,i)=> toNum($("#risk_"+i).value))
+  };
+}
+
+/* ---------- Сохранение в localStorage ---------- */
+const STORAGE_KEY = "white-scheme-calculator-v1";
+function saveState(){
+  const state = getInputs();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try{
+    const s = JSON.parse(raw);
+    // простая загрузка значений, если поля совпадают
+    Object.entries(s).forEach(([k,v])=>{
+      const el = $("#"+k);
+      if(el && el.tagName === "INPUT") el.value = v;
+    });
+    if (Array.isArray(s.risks)) {
+      s.risks.forEach((v,i)=>{
+        const el = $("#risk_"+i);
+        if(el) el.value = v;
+      });
+    }
+  }catch(e){}
+}
+
+/* ---------- Расчёт ---------- */
+function calculate(){
+  const x = getInputs();
+
+  // Риск
+  const R = x.risks.length ? (x.risks.reduce((a,b)=>a+b,0) / x.risks.length) : 0;
+  const P3 = R * 0.3;
+  const P = P3 / 36;
+
+  $("#R").value = fmt2(R);
+  $("#P3").value = fmt2(P3);
+  $("#P").value = fmt2(P);
+
+  // Промежуточные
+  const M = x.rk * (1 + x.north);
+  const G = x.W / (1 - x.p);
+  const G_min = x.mrot * M;
+  const W_min = G_min * (1 - x.p);
+  const E = Math.max(x.W - W_min, 0); // «конверт» в серой схеме, не отрицательный
+
+  $("#M").value = fmt2(M);
+  $("#G").value = fmt2(G);
+  $("#Gmin").value = fmt2(G_min);
+  $("#Wmin").value = fmt2(W_min);
+  $("#E").value = fmt2(E);
+
+  // Стоимости
+  const C_white =
+    (1 - x.t) * (1 + x.c) * G +
+    (x.accWhite + x.lawWhite) -
+    x.Smed;
+
+  const C_grey =
+    (1 - x.t) * (1 + x.c) * G_min +
+    (1 + x.k) * E +
+    (x.accGrey + x.lawGrey + x.svcBlack + x.it) +
+    P * x.t * E * x.phi;
+
+  const C_black =
+    (1 + x.k) * x.W +
+    (x.accBlack + x.lawBlack + x.svcBlack + x.it) +
+    P * x.t * x.W * x.phi;
+
+  // Таблица
+  $("#whiteM").textContent = fmt(C_white);
+  $("#whiteY").textContent = fmt(C_white * 12);
+
+  $("#greyM").textContent = fmt(C_grey);
+  $("#greyY").textContent = fmt(C_grey * 12);
+  $("#greySave").textContent = (C_white - C_grey >= 0 ? "+" : "−") + fmt(Math.abs(C_white - C_grey));
+  $("#greySave").className = "kpi " + (C_white - C_grey >= 0 ? "good" : "bad");
+
+  $("#blackM").textContent = fmt(C_black);
+  $("#blackY").textContent = fmt(C_black * 12);
+  $("#blackSave").textContent = (C_white - C_black >= 0 ? "+" : "−") + fmt(Math.abs(C_white - C_black));
+  $("#blackSave").className = "kpi " + (C_white - C_black >= 0 ? "good" : "bad");
+
+  updateCharts(C_white, C_grey, C_black);
+  saveState();
+}
+
+/* ---------- Графики ---------- */
+let bar, pie;
+function updateCharts(cw, cg, cb){
+  const labels = ["Белая","Серая","Чёрная"];
+  const data = [cw, cg, cb];
+
+  const ctxBar = document.getElementById('barChart').getContext('2d');
+  const ctxPie = document.getElementById('pieChart').getContext('2d');
+
+  if(bar) bar.destroy();
+  if(pie) pie.destroy();
+
+  bar = new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{label: 'Руб/мес', data}]
+    },
+    options: {
+      responsive:true,
+      plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=> c.raw.toLocaleString('ru-RU')+" ₽"}}},
+      scales:{y:{ticks:{callback:(v)=>v.toLocaleString('ru-RU')+" ₽"}}}
+    }
+  });
+
+  pie = new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{data}]
+    },
+    options: {
+      responsive:true,
+      plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:(c)=> `${c.label}: ${c.raw.toLocaleString('ru-RU')} ₽`}}}
+    }
+  });
+}
+
+/* ---------- Слушатели ---------- */
+document.addEventListener('input', e=>{
+  // live-перерасчёт при изменении любого инпута
+  if(e.target.matches('input, select')) calculate();
+});
+$("#calcBtn").addEventListener('click', calculate);
+$("#resetBtn").addEventListener('click', ()=>{
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+});
+$("#printBtn").addEventListener('click', ()=> window.print());
+
+/* ---------- Инициализация ---------- */
+buildRisks();
+loadState();
+calculate();
+</script>
 </body>
 </html>
