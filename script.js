@@ -3,25 +3,26 @@ const steps = document.querySelectorAll(".step");
 const nextBtns = document.querySelectorAll(".next");
 const prevBtns = document.querySelectorAll(".prev");
 
-let regions = [];
 let selectedRegion = null;
 
-// Регион и кнопка Далее
+// ======= Регионы (вшиты в скрипт) =======
+const regions = [
+  {region_code: "29", region_name: "Архангельская область", rk: 1.2, sever: 0.5, rosstat_url: "https://rosstat.gov.ru/folder/11109?print=29"},
+  {region_code: "77", region_name: "Москва", rk: 1.0, sever: 0.0, rosstat_url: "https://rosstat.gov.ru/folder/11109?print=77"},
+  {region_code: "51", region_name: "Мурманская область", rk: 1.3, sever: 0.6, rosstat_url: "https://rosstat.gov.ru/folder/11109?print=51"}
+];
+
+// ======= Работа с регионом =======
 const regionSelect = document.getElementById("regionSelect");
 const nextStep1 = document.getElementById("nextStep1");
 
-// Загрузка регионов из regions.json
-fetch("regions.json")
-  .then(res => res.json())
-  .then(data => {
-    regions = data;
-    regions.forEach(r => {
-      const opt = document.createElement("option");
-      opt.value = r.region_code;
-      opt.textContent = r.region_name;
-      regionSelect.appendChild(opt);
-    });
-  });
+// Заполняем select
+regions.forEach(r => {
+  const opt = document.createElement("option");
+  opt.value = r.region_code;
+  opt.textContent = r.region_name;
+  regionSelect.appendChild(opt);
+});
 
 // Выбор региона
 regionSelect.addEventListener("change", () => {
@@ -39,7 +40,7 @@ regionSelect.addEventListener("change", () => {
   }
 });
 
-// Навигация шагов
+// ======= Навигация шагов =======
 nextBtns.forEach(btn => btn.addEventListener("click", () => {
   if(currentStep < steps.length) {
     steps[currentStep-1].classList.remove("active");
@@ -60,7 +61,7 @@ prevBtns.forEach(btn => btn.addEventListener("click", () => {
   }
 }));
 
-// Чек-лист рисков
+// ======= Чек-лист рисков =======
 const riskFactors = [
   "Доля «технических» контрагентов",
   "Средняя ЗП vs. регион",
@@ -86,7 +87,7 @@ function generateRisks() {
   });
 }
 
-// Расчёты
+// ======= Расчёты =======
 function calculateResults() {
   const W = parseFloat(document.getElementById("W").value);
   const MROT = parseFloat(document.getElementById("MROT").value);
@@ -125,7 +126,6 @@ function calculateResults() {
   const C_grey = ((1-t)*(1+c)*G_min) + (1+k)*E + b_grey + y_grey + serv_black + servers + P_m*t*E*phi;
   const C_black = (1+k)*W + b_black + y_black + serv_black + servers + P_m*t*W*phi;
 
-  // Вывод таблицы
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = `
   <table>
@@ -135,7 +135,7 @@ function calculateResults() {
     <tr><td>Чёрная</td><td>${C_black.toFixed(0)}</td><td>${(C_black*12).toFixed(0)}</td><td>${(C_white-C_black).toFixed(0)}</td></tr>
   </table>`;
 
-  // Chart.js график
+  // Chart.js
   const ctx = document.getElementById("chart").getContext("2d");
   if(window.myChart) window.myChart.destroy();
   window.myChart = new Chart(ctx, {
@@ -151,10 +151,10 @@ function calculateResults() {
     options: { responsive:true, maintainAspectRatio:false }
   });
 
-  window.finalValues = {C_white, C_grey, C_black};
+  window.finalValues = {C_white,C_grey,C_black};
 }
 
-// Аргументы
+// ======= Аргументы =======
 function showArguments() {
   document.getElementById("arguments").innerHTML = `
   <ul>
@@ -167,7 +167,7 @@ function showArguments() {
   </ul>`;
 }
 
-// Анимация весов
+// ======= Анимация весов =======
 function showScales() {
   const scalesDiv = document.getElementById("scales");
   const {C_white,C_grey,C_black} = window.finalValues;
@@ -179,6 +179,5 @@ function showScales() {
     <circle cx="${200+50*(totalRisk-C_white)/totalRisk}" cy="100" r="30" fill="#f44336"/>
     <text x="${200-50*(totalRisk-C_white)/totalRisk-15}" y="105" fill="white">${C_white.toFixed(0)}</text>
     <text x="${200+50*(totalRisk-C_white)/totalRisk-15}" y="105" fill="white">${totalRisk.toFixed(0)}</text>
-  </svg>
-  `;
+  </svg>`;
 }
