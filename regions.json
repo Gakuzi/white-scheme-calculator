@@ -1,4 +1,5 @@
 [
-  {"region_code":"29","region_name":"Архангельская область","rk":1.2,"sever":0.5,"rosstat_url":"https://rosstat.gov.ru/folder/11109?print=29"},
-  {"region_code":"77","region_name":"Москва","rk":1.0,"sever":0,"rosstat_url":"https://rosstat.gov.ru/folder/11109?print=77"}
+  {"region_code":"29","region_name":"Архангельская область","RK":1.2,"north":0.5,"MROT":19242,"p":0.13,"c":0.3,"t":0.15,"k":0.13,"phi":1.2,"S_med":1700},
+  {"region_code":"77","region_name":"г. Москва","RK":1.0,"north":0.0,"MROT":19242,"p":0.13,"c":0.3,"t":0.15,"k":0.13,"phi":1.2,"S_med":1700}
+  // Добавьте остальные регионы РФ аналогично
 ]
