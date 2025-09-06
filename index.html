@@ -1,126 +1,61 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Белая схема выгоднее</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мастер белой зарплаты</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div id="wizard">
-    <!-- Шаг 1: Регион и сотрудники -->
-    <section class="step active" data-step="1">
-      <h2>Шаг 1. Выбор региона</h2>
-      <label>Регион:
-        <select id="regionSelect">
-          <option value="">Выберите регион...</option>
-        </select>
-      </label>
-      <div id="regionInfo"></div>
-      <label>Количество сотрудников:
-        <input type="number" id="numEmployees" value="10" min="1">
-      </label>
-      <button class="next" id="nextStep1" disabled>Далее →</button>
-    </section>
-
-    <!-- Шаг 2: Входные данные -->
-    <section class="step" data-step="2">
-      <h2>Шаг 2. Входные данные</h2>
-      <label>Зарплата на руки (W):
-        <input type="number" id="W" value="100000">
-      </label>
-      <label>МРОТ:
-        <input type="number" id="MROT" value="19242">
-      </label>
-      <label>НДФЛ (%):
-        <input type="number" id="p" value="13">
-      </label>
-      <label>Взносы (%):
-        <input type="number" id="c" value="30">
-      </label>
-      <label>Ставка УСН (%):
-        <input type="number" id="t" value="15">
-      </label>
-      <label>Комиссия обнала (%):
-        <input type="number" id="k" value="13">
-      </label>
-      <label>Штрафной множитель:
-        <input type="number" id="phi" value="1.2" step="0.1">
-      </label>
-      <button class="prev">← Назад</button>
-      <button class="next">Далее →</button>
-    </section>
-
-    <!-- Шаг 3: Чек-лист рисков -->
-    <section class="step" data-step="3">
-      <h2>Шаг 3. Чек-лист рисков</h2>
-      <div id="risks"></div>
-      <button class="prev">← Назад</button>
-      <button class="next">Далее →</button>
-    </section>
-
-    <!-- Шаг 4: Затраты -->
-    <section class="step" data-step="4">
-      <h2>Шаг 4. Затраты</h2>
-      <label>Бухгалтер (белая):
-        <input type="number" id="b_white" value="3000">
-      </label>
-      <label>Бухгалтер (серая):
-        <input type="number" id="b_grey" value="4000">
-      </label>
-      <label>Бухгалтер (чёрная):
-        <input type="number" id="b_black" value="4500">
-      </label>
-      <label>Юрист (белая):
-        <input type="number" id="y_white" value="3500">
-      </label>
-      <label>Юрист (серая):
-        <input type="number" id="y_grey" value="5000">
-      </label>
-      <label>Юрист (чёрная):
-        <input type="number" id="y_black" value="6500">
-      </label>
-      <label>Обслуживание «чёрной» бухгалтерии:
-        <input type="number" id="serv_black" value="0">
-      </label>
-      <label>Серверы/ИТ:
-        <input type="number" id="servers" value="0">
-      </label>
-      <label>Экономия на больничных (S_med):
-        <input type="number" id="S_med" value="1700">
-      </label>
-      <button class="prev">← Назад</button>
-      <button class="next">Далее →</button>
-    </section>
-
-    <!-- Шаг 5: Результаты -->
-    <section class="step" data-step="5">
-      <h2>Шаг 5. Результаты</h2>
-      <div id="results"></div>
-      <canvas id="chart" width="400" height="200"></canvas>
-      <button class="prev">← Назад</button>
-      <button class="next">Далее →</button>
-    </section>
-
-    <!-- Шаг 6: Аргументы -->
-    <section class="step" data-step="6">
-      <h2>Шаг 6. Почему белая схема лучше</h2>
-      <div id="arguments"></div>
-      <button class="prev">← Назад</button>
-      <button class="next">Финал →</button>
-    </section>
-
-    <!-- Финал -->
-    <section class="step" data-step="7">
-      <h2>Финальный результат</h2>
-      <div id="scales"></div>
-      <p class="conclusion">Белая схема перевешивает — это не только честно, но и выгодно.</p>
-      <p><a href="https://rosstat.gov.ru/" target="_blank">Росстат</a> | 
-         <a href="https://www.nalog.ru/" target="_blank">ФНС</a> | 
-         <a href="https://minfin.gov.ru/" target="_blank">Минфин</a></p>
-      <button class="prev">← Назад</button>
-    </section>
+<div class="wizard-container">
+  <h1>Мастер белой зарплаты</h1>
+  
+  <div id="step1" class="step">
+    <h2>Шаг 1: Выбор региона</h2>
+    <input type="text" id="regionSearch" placeholder="Поиск региона">
+    <select id="regionSelect"></select>
+    <p>По умолчанию выбран Архангельск</p>
+    <button onclick="nextStep(2)">Далее</button>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+
+  <div id="step2" class="step" style="display:none">
+    <h2>Шаг 2: Ввод данных сотрудников</h2>
+    <label>Зарплата на руки (₽): <input type="number" id="salary" value="100000"></label><br>
+    <label>Количество сотрудников: <input type="number" id="numEmployees" value="1"></label><br>
+    <label>Затраты на бухгалтера (₽): <input type="number" id="accountant" value="60000"></label><br>
+    <label>Затраты на юриста (₽): <input type="number" id="lawyer" value="70000"></label><br>
+    <button onclick="prevStep(1)">Назад</button>
+    <button onclick="nextStep(3)">Далее</button>
+  </div>
+
+  <div id="step3" class="step" style="display:none">
+    <h2>Шаг 3: Чек-лист рисков</h2>
+    <label>Доля технических контрагентов: 
+      <select id="riskTech"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
+    <label>Средняя ЗП vs регион:
+      <select id="riskSalary"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
+    <label>Доля наличных расходов:
+      <select id="riskCash"><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option></select>
+    </label><br>
+    <button onclick="prevStep(2)">Назад</button>
+    <button onclick="calculate()">Рассчитать</button>
+  </div>
+
+  <div id="step4" class="step" style="display:none">
+    <h2>Результаты</h2>
+    <canvas id="chart"></canvas>
+    <div id="balances">
+      <svg id="scale" width="400" height="200"></svg>
+    </div>
+    <h3>Аргументы в пользу белой схемы</h3>
+    <ul id="argumentsList"></ul>
+    <button onclick="prevStep(3)">Назад</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
