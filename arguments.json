@@ -1,12 +1,6 @@
 [
-  {
-    "title": "Лояльность сотрудников",
-    "description": "Белая зарплата повышает лояльность, снижает текучесть.",
-    "source": "https://happy-job.ru/types-of-surveys/loyalty-survey/"
-  },
-  {
-    "title": "Стоимость найма сотрудника",
-    "description": "Привлечение нового сотрудника стоит компании 3–6 окладов.",
-    "source": "https://assessmentsystemsrussia.ru/blog/articles/stoimost-najma-sotrudnikov-cena-kadrovoj-oshibki/"
-  }
+  {"text":"Белая зарплата повышает лояльность сотрудников","link":"https://happy-job.ru/types-of-surveys/loyalty-survey/"},
+  {"text":"Стоимость найма нового сотрудника выше, если зарплата серая","link":"https://assessmentsystemsrussia.ru/blog/articles/stoimost-najma-sotrudnikov-cena-kadrovoj-oshibki/"},
+  {"text":"Прозрачная бухгалтерия позволяет участвовать в госзакупках","link":"https://www.goszakupki.ru/"},
+  {"text":"Аутсорсинг бухгалтерии снижает затраты в разы","link":"https://www.tadviser.ru/index.php/Бухгалтерская_услуга"}
 ]
