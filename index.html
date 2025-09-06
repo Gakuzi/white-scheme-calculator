@@ -11,13 +11,15 @@
     <section class="step active" data-step="1">
       <h2>Шаг 1. Выбор региона</h2>
       <label>Регион:
-        <input type="text" id="regionSearch" placeholder="Введите название или код региона...">
+        <select id="regionSelect">
+          <option value="">Выберите регион...</option>
+        </select>
       </label>
       <div id="regionInfo"></div>
       <label>Количество сотрудников:
         <input type="number" id="numEmployees" value="10" min="1">
       </label>
-      <button class="next">Далее →</button>
+      <button class="next" id="nextStep1" disabled>Далее →</button>
     </section>
 
     <!-- Шаг 2: Входные данные -->
